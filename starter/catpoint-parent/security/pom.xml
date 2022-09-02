@@ -13,7 +13,7 @@
     <artifactId>security</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>catpoint-parent</name>
+    <name>catpoint-security</name>
     <url>http://www.example.com</url>
 
     <properties>

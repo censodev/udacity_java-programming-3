@@ -13,7 +13,7 @@
     <artifactId>image</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>catpoint-parent</name>
+    <name>catpoint-image</name>
     <url>http://www.example.com</url>
 
     <properties>
