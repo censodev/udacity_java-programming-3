@@ -37,6 +37,14 @@ public class SecurityService {
     public void setArmingStatus(ArmingStatus armingStatus) {
         if(armingStatus == ArmingStatus.DISARMED) {
             setAlarmStatus(AlarmStatus.NO_ALARM);
+        } else {
+            // fix for test case 10
+            getSensors()
+                    .forEach(sensor -> {
+                        sensor.setActive(false);
+                        securityRepository.updateSensor(sensor);
+                    })
+            ;
         }
         securityRepository.setArmingStatus(armingStatus);
     }
@@ -95,8 +103,14 @@ public class SecurityService {
      */
     private void handleSensorDeactivated() {
         switch(securityRepository.getAlarmStatus()) {
-            case PENDING_ALARM -> setAlarmStatus(AlarmStatus.NO_ALARM);
-            case ALARM -> setAlarmStatus(AlarmStatus.PENDING_ALARM);
+            case PENDING_ALARM -> {
+                // fix for test case 3
+                if (getSensors().stream().noneMatch(Sensor::getActive)) {
+                    setAlarmStatus(AlarmStatus.NO_ALARM);
+                }
+            }
+//            fix for test case 4
+//            case ALARM -> setAlarmStatus(AlarmStatus.PENDING_ALARM);
         }
     }
 
@@ -107,6 +121,8 @@ public class SecurityService {
      */
     public void changeSensorActivationStatus(Sensor sensor, Boolean active) {
         if(!sensor.getActive() && active) {
+            handleSensorActivated();
+        } else if (sensor.getActive() && active) {  // fix for test case 5
             handleSensorActivated();
         } else if (sensor.getActive() && !active) {
             handleSensorDeactivated();
