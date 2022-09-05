@@ -8,6 +8,7 @@ import com.udacity.catpoint.security.data.SecurityRepository;
 import com.udacity.catpoint.security.data.Sensor;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,12 +40,11 @@ public class SecurityService {
             setAlarmStatus(AlarmStatus.NO_ALARM);
         } else {
             // fix for test case 10
-            getSensors()
-                    .forEach(sensor -> {
-                        sensor.setActive(false);
-                        securityRepository.updateSensor(sensor);
-                    })
-            ;
+            var sensors = new ArrayList<>(getSensors());
+            for (var i = 0; i < sensors.size(); i++) {
+                sensors.get(i).setActive(false);
+                securityRepository.updateSensor(sensors.get(i));
+            }
         }
         securityRepository.setArmingStatus(armingStatus);
     }
