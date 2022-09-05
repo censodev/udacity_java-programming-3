@@ -45,6 +45,7 @@ public class SecurityService {
                 sensors.get(i).setActive(false);
                 securityRepository.updateSensor(sensors.get(i));
             }
+            statusListeners.forEach(StatusListener::sensorStatusChanged);
         }
         securityRepository.setArmingStatus(armingStatus);
     }
