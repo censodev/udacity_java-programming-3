@@ -8,9 +8,9 @@ import com.udacity.catpoint.security.data.SecurityRepository;
 import com.udacity.catpoint.security.data.Sensor;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Service that receives information about changes to the security system. Responsible for
@@ -40,11 +40,11 @@ public class SecurityService {
             setAlarmStatus(AlarmStatus.NO_ALARM);
         } else {
             // fix for test case 10
-            var sensors = new ArrayList<>(getSensors());
-            for (var i = 0; i < sensors.size(); i++) {
-                sensors.get(i).setActive(false);
-                securityRepository.updateSensor(sensors.get(i));
-            }
+            var sensors = new CopyOnWriteArrayList<>(getSensors());
+            sensors.forEach(sensor -> {
+                sensor.setActive(false);
+                securityRepository.updateSensor(sensor);
+            });
             statusListeners.forEach(StatusListener::sensorStatusChanged);
         }
         securityRepository.setArmingStatus(armingStatus);
