@@ -47,18 +47,6 @@ class SecurityServiceTest {
     @InjectMocks
     SecurityService securityService;
 
-    @BeforeEach
-    void setUp() {
-    }
-
-    @AfterEach
-    void tearDown() {
-    }
-
-    @Test
-    void setArmingStatus() {
-    }
-
     @Test
     void addStatusListener() {
     }
@@ -91,16 +79,23 @@ class SecurityServiceTest {
         verify(securityRepository, times(1)).setAlarmStatus(AlarmStatus.ALARM);
     }
 
-    @Test
+    @ParameterizedTest
+    @EnumSource(value = ArmingStatus.class, names = {"ARMED_HOME", "ARMED_AWAY"})
     @DisplayName("3. If pending alarm and all sensors are inactive, return to no alarm state.")
-    void changeSensorActivationStatus_PendingAlarmAndAllSensorInactive_AlarmStatus2NoAlarm() {
-        var inactiveSensors = Set.of(
+    void changeSensorActivationStatus_PendingAlarmAndAllSensorInactive_AlarmStatus2NoAlarm(ArmingStatus armingStatus) {
+        when(securityRepository.getArmingStatus()).thenReturn(armingStatus);
+        var sensors = Set.of(
                 new Sensor("", SensorType.DOOR, false),
                 new Sensor("", SensorType.DOOR, false)
         );
+        when(securityRepository.getSensors()).thenReturn(sensors);
+
+        when(securityRepository.getAlarmStatus()).thenReturn(AlarmStatus.NO_ALARM);
+        securityService.changeSensorActivationStatus(sensors.stream().findFirst().get(), true);
+        verify(securityRepository, times(1)).setAlarmStatus(AlarmStatus.PENDING_ALARM);
+
         when(securityRepository.getAlarmStatus()).thenReturn(AlarmStatus.PENDING_ALARM);
-        when(securityRepository.getSensors()).thenReturn(inactiveSensors);
-        securityService.changeSensorActivationStatus(new Sensor("", SensorType.DOOR, true), false);
+        securityService.changeSensorActivationStatus(sensors.stream().findFirst().get(), false);
         verify(securityRepository, times(1)).setAlarmStatus(AlarmStatus.NO_ALARM);
     }
 
