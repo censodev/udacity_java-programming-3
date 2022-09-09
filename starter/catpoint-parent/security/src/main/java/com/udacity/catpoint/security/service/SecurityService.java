@@ -172,14 +172,6 @@ public class SecurityService {
         return securityRepository.getArmingStatus();
     }
 
-    public ArmingStatus getOldArming() {
-        return oldArming;
-    }
-
-    public boolean getCatDetected() {
-        return catDetected;
-    }
-
     public void setCatDetected(boolean catDetected) {
         this.catDetected = catDetected;
     }
