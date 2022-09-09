@@ -40,7 +40,7 @@ public class SecurityService {
      * @param armingStatus
      */
     public void setArmingStatus(ArmingStatus armingStatus) {
-        if (oldArming == ArmingStatus.DISARMED && armingStatus == ArmingStatus.ARMED_HOME) {
+        if (oldArming == ArmingStatus.DISARMED && armingStatus == ArmingStatus.ARMED_HOME && catDetected) {
             setAlarmStatus(AlarmStatus.ALARM);
         }
         if(armingStatus == ArmingStatus.DISARMED) {
