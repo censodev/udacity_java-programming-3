@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
@@ -163,13 +164,14 @@ class SecurityServiceTest {
                 .forEach(sensor -> assertEquals(false, sensor.getActive()));
     }
 
-    @Test
+    @ParameterizedTest
+    @CsvSource({"true, 1", "false, 0"})
     @DisplayName("11. If the system is armed-home while the camera shows a cat, set the alarm status to alarm.")
-    void setArmingStatus_Disarmed2ArmedHomeAndContainCat_AlarmStatus2Alarm() {
+    void setArmingStatus_Disarmed2ArmedHomeAndContainCat_AlarmStatus2Alarm(boolean catDetected, int verifySetAlarm) {
         securityService.setArmingStatus(ArmingStatus.DISARMED);
-        securityService.setCatDetected(true);
+        securityService.setCatDetected(catDetected);
         securityService.setArmingStatus(ArmingStatus.ARMED_HOME);
-        verify(securityRepository, times(1)).setAlarmStatus(AlarmStatus.ALARM);
+        verify(securityRepository, times(verifySetAlarm)).setAlarmStatus(AlarmStatus.ALARM);
     }
 
     private static Stream<Arguments> provideCensorChanges() {
