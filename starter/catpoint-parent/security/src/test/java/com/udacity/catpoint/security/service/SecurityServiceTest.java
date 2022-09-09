@@ -168,10 +168,10 @@ class SecurityServiceTest {
 
     @Test
     @DisplayName("11. If the system is armed-home while the camera shows a cat, set the alarm status to alarm.")
-    void processImage_ArmedHomeAndContainCat_AlarmStatus2Alarm() {
-        when(imageService.imageContainsCat(any(), anyFloat())).thenReturn(true);
-        when(securityRepository.getArmingStatus()).thenReturn(ArmingStatus.ARMED_HOME);
-        securityService.processImage(new BufferedImage(1, 1, 1));
+    void setArmingStatus_Disarmed2ArmedHomeAndContainCat_AlarmStatus2Alarm() {
+        securityService.setArmingStatus(ArmingStatus.DISARMED);
+        securityService.setCatDetected(true);
+        securityService.setArmingStatus(ArmingStatus.ARMED_HOME);
         verify(securityRepository, times(1)).setAlarmStatus(AlarmStatus.ALARM);
     }
 

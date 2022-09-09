@@ -20,6 +20,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * class you will be writing unit tests for.
  */
 public class SecurityService {
+    private ArmingStatus oldArming;
+    private boolean catDetected = false;
 
     private ImageService imageService;
     private SecurityRepository securityRepository;
@@ -28,6 +30,8 @@ public class SecurityService {
     public SecurityService(SecurityRepository securityRepository, ImageService imageService) {
         this.securityRepository = securityRepository;
         this.imageService = imageService;
+
+        oldArming = getArmingStatus();
     }
 
     /**
@@ -36,6 +40,9 @@ public class SecurityService {
      * @param armingStatus
      */
     public void setArmingStatus(ArmingStatus armingStatus) {
+        if (oldArming == ArmingStatus.DISARMED && armingStatus == ArmingStatus.ARMED_HOME) {
+            setAlarmStatus(AlarmStatus.ALARM);
+        }
         if(armingStatus == ArmingStatus.DISARMED) {
             setAlarmStatus(AlarmStatus.NO_ALARM);
         } else {
@@ -48,6 +55,7 @@ public class SecurityService {
             statusListeners.forEach(StatusListener::sensorStatusChanged);
         }
         securityRepository.setArmingStatus(armingStatus);
+        oldArming = armingStatus;
     }
 
     /**
@@ -61,7 +69,7 @@ public class SecurityService {
         } else {
             setAlarmStatus(AlarmStatus.NO_ALARM);
         }
-
+        catDetected = cat;
         statusListeners.forEach(sl -> sl.catDetected(cat));
     }
 
@@ -159,5 +167,17 @@ public class SecurityService {
 
     public ArmingStatus getArmingStatus() {
         return securityRepository.getArmingStatus();
+    }
+
+    public ArmingStatus getOldArming() {
+        return oldArming;
+    }
+
+    public boolean getCatDetected() {
+        return catDetected;
+    }
+
+    public void setCatDetected(boolean catDetected) {
+        this.catDetected = catDetected;
     }
 }
