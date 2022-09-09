@@ -66,7 +66,7 @@ public class SecurityService {
     private void catDetected(Boolean cat) {
         if(cat && getArmingStatus() == ArmingStatus.ARMED_HOME) {
             setAlarmStatus(AlarmStatus.ALARM);
-        } else {
+        } else if (securityRepository.getSensors().stream().noneMatch(Sensor::getActive)) {
             setAlarmStatus(AlarmStatus.NO_ALARM);
         }
         catDetected = cat;

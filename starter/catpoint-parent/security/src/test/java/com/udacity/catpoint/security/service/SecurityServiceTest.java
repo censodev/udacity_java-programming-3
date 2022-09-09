@@ -137,12 +137,14 @@ class SecurityServiceTest {
         verify(securityRepository, times(1)).setAlarmStatus(AlarmStatus.ALARM);
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("provideTestMaterialCase8")
     @DisplayName("8. If the image service identifies an image that does not contain a cat, change the status to no alarm as long as the sensors are not active.")
-    void processImage_NotContainCatAndSensorsNotActive_AlarmStatus2NoAlarm() {
+    void processImage_NotContainCatAndSensorsNotActive_AlarmStatus2NoAlarm(Set<Sensor> sensors, int verifyCallChangeNoAlarm) {
         when(imageService.imageContainsCat(any(), anyFloat())).thenReturn(false);
+        when(securityRepository.getSensors()).thenReturn(sensors);
         securityService.processImage(new BufferedImage(1, 1, 1));
-        verify(securityRepository, times(1)).setAlarmStatus(AlarmStatus.NO_ALARM);
+        verify(securityRepository, times(verifyCallChangeNoAlarm)).setAlarmStatus(AlarmStatus.NO_ALARM);
     }
 
     @Test
@@ -179,6 +181,19 @@ class SecurityServiceTest {
         return Stream.of(
                 Arguments.of(new Sensor("", SensorType.DOOR, true), false),
                 Arguments.of(new Sensor("", SensorType.DOOR, false), true)
+        );
+    }
+
+    private static Stream<Arguments> provideTestMaterialCase8() {
+        return Stream.of(
+                Arguments.of(Set.of(
+                        new Sensor("", SensorType.DOOR, false),
+                        new Sensor("", SensorType.DOOR, false)
+                ), 1),
+                Arguments.of(Set.of(
+                        new Sensor("", SensorType.DOOR, false),
+                        new Sensor("", SensorType.DOOR, true)
+                ), 0)
         );
     }
 }
